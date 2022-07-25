@@ -1,4 +1,4 @@
-# Unity3D ML Agents Tests
+# Unity3D ML Agents 
 Playing with the Unity3D ML agents package.
 
 ### Currently Implemented:
