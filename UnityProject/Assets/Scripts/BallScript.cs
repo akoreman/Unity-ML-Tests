@@ -30,9 +30,9 @@ public class BallScript : Agent
         }
 
         // Move the ball to a new spot
-        this.gameObject.GetComponent<Transform>().localPosition = new Vector3(Random.value * 8 - 4,
+        this.gameObject.GetComponent<Transform>().localPosition = new Vector3(Random.value * 30 - 15,
                                            0.5f,
-                                           Random.value * 8 - 4);
+                                           Random.value * 30 - 15);
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -46,10 +46,17 @@ public class BallScript : Agent
         sensor.AddObservation(rBody.velocity.x);
         sensor.AddObservation(rBody.velocity.z);
 
+
+
         for (int i = 0; i < numRayCasts; i++)
         {
-            sensor.AddObservation(collidedThisEpisode &= Physics.Raycast(this.transform.position, new Vector3(Mathf.Cos(i * 2 * Mathf.PI / numRayCasts), 0f, Mathf.Sin(i * 2 * Mathf.PI / numRayCasts)), castDistance));
+            sensor.AddObservation(Physics.Raycast(this.transform.position, new Vector3(Mathf.Cos(i * 2 * Mathf.PI / numRayCasts), 0f, Mathf.Sin(i * 2 * Mathf.PI / numRayCasts)), castDistance));
         }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        collidedThisEpisode = true;
     }
 
     public float forceMultiplier = 10;
@@ -67,17 +74,26 @@ public class BallScript : Agent
         // Reached target
         if (distanceToTarget < 1.42f)
         {
-            SetReward(1.0f);
+            //SetReward(1.0f);
+
+            if (collidedThisEpisode)
+                SetReward(0.5f);
+            else
+                SetReward(1.0f);
+
+            collidedThisEpisode = false;
             EndEpisode();
         }
 
         if (StepCount > 1000)
         {
+            
             if (collidedThisEpisode)
-                SetReward(1.0f / distanceToTarget - 1f);
+                SetReward(1.0f / distanceToTarget * 1/2);
             else
                 SetReward(1.0f / distanceToTarget);
-
+            
+            //SetReward(0f);
             collidedThisEpisode = false;
             EndEpisode();
         }
@@ -85,7 +101,7 @@ public class BallScript : Agent
         // Fell off platform
         else if (this.transform.localPosition.y < 0)
         {
-            SetReward(-100.0f);
+            SetReward(0f);
             EndEpisode();
         }
     }

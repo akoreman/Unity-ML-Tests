@@ -1,32 +1,23 @@
 {
-    "Ball_config": {
+    "Ball": {
         "checkpoints": [
             {
-                "steps": 499989,
-                "file_path": "results\\ppo\\Ball_config\\Ball_config-499989.onnx",
-                "reward": 0.1964314901144118,
-                "creation_time": 1659046953.7030373,
+                "steps": 175141,
+                "file_path": "results\\ppo\\Ball\\Ball-175141.onnx",
+                "reward": null,
+                "creation_time": 1659220284.2476494,
                 "auxillary_file_paths": [
-                    "results\\ppo\\Ball_config\\Ball_config-499989.pt"
-                ]
-            },
-            {
-                "steps": 500053,
-                "file_path": "results\\ppo\\Ball_config\\Ball_config-500053.onnx",
-                "reward": 0.1964314901144118,
-                "creation_time": 1659046953.7337894,
-                "auxillary_file_paths": [
-                    "results\\ppo\\Ball_config\\Ball_config-500053.pt"
+                    "results\\ppo\\Ball\\Ball-175141.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 500053,
-            "file_path": "results\\ppo\\Ball_config.onnx",
-            "reward": 0.1964314901144118,
-            "creation_time": 1659046953.7337894,
+            "steps": 175141,
+            "file_path": "results\\ppo\\Ball.onnx",
+            "reward": null,
+            "creation_time": 1659220284.2476494,
             "auxillary_file_paths": [
-                "results\\ppo\\Ball_config\\Ball_config-500053.pt"
+                "results\\ppo\\Ball\\Ball-175141.pt"
             ]
         }
     },
