@@ -8,9 +8,15 @@ using Unity.MLAgents.Actuators;
 public class BallScript : Agent
 {
     public int numRayCasts = 8;
-    public float castDistance = 1.5f;
+    public float castDistance = 2.5f;
+    public float penaltyPerCollision = .05f;
 
     bool collidedThisEpisode = false;
+    float collidedPenalty = 0f;
+
+    float[] rayVector;
+
+    float inf = 0f;
 
     Rigidbody rBody;
     void Start()
@@ -22,88 +28,75 @@ public class BallScript : Agent
     public override void OnEpisodeBegin()
     {
         // If the Agent fell, zero its momentum
-        if (this.transform.localPosition.y < 0)
-        {
-            this.rBody.angularVelocity = Vector3.zero;
-            this.rBody.velocity = Vector3.zero;
-            this.transform.localPosition = new Vector3(0, 0.5f, 0);
-        }
-
+        this.rBody.angularVelocity = Vector3.zero;
+        this.rBody.velocity = Vector3.zero;
+        
         // Move the ball to a new spot
-        this.gameObject.GetComponent<Transform>().localPosition = new Vector3(Random.value * 30 - 15,
+        this.transform.localPosition = new Vector3(Random.value * 30 - 15,
                                            0.5f,
                                            Random.value * 30 - 15);
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Target and Agent positions
-        //sensor.AddObservation(Target.localPosition);
+        // target and Agent positions
         sensor.AddObservation(this.transform.localPosition);
         sensor.AddObservation(Vector3.Distance(this.transform.localPosition, Target.localPosition));
 
-        // Agent velocity
+        // agent velocity
         sensor.AddObservation(rBody.velocity.x);
         sensor.AddObservation(rBody.velocity.z);
 
+        rayVector = new float[8];
 
+        RaycastHit raycastHit;
 
         for (int i = 0; i < numRayCasts; i++)
-        {
-            sensor.AddObservation(Physics.Raycast(this.transform.position, new Vector3(Mathf.Cos(i * 2 * Mathf.PI / numRayCasts), 0f, Mathf.Sin(i * 2 * Mathf.PI / numRayCasts)), castDistance));
-        }
+            rayVector[i] = Physics.Raycast(this.transform.position, new Vector3(Mathf.Cos(i / numRayCasts * 2 * Mathf.PI), 0f, Mathf.Sin(i / numRayCasts * 2 * Mathf.PI)), out raycastHit, castDistance) ? raycastHit.distance : inf;
+
+        sensor.AddObservation(rayVector);
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        collidedThisEpisode = true;
+        collidedPenalty += penaltyPerCollision;
     }
 
     public float forceMultiplier = 10;
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        // Actions, size = 2
         Vector3 controlSignal = Vector3.zero;
         controlSignal.x = actionBuffers.ContinuousActions[0];
         controlSignal.z = actionBuffers.ContinuousActions[1];
         rBody.AddForce(controlSignal * forceMultiplier);
 
-        // Rewards
         float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
 
-        // Reached target
+        // reward when target reached
         if (distanceToTarget < 1.42f)
         {
-            //SetReward(1.0f);
-
-            if (collidedThisEpisode)
-                SetReward(0.5f);
-            else
-                SetReward(1.0f);
-
-            collidedThisEpisode = false;
-            EndEpisode();
+            EndWithReward(Mathf.Max(1.0f - collidedPenalty, 0.5f));
         }
 
+        // when too many steps
         if (StepCount > 1000)
         {
-            
-            if (collidedThisEpisode)
-                SetReward(1.0f / distanceToTarget * 1/2);
-            else
-                SetReward(1.0f / distanceToTarget);
-            
-            //SetReward(0f);
-            collidedThisEpisode = false;
-            EndEpisode();
+            EndWithReward(Mathf.Max(1.42f / distanceToTarget - collidedPenalty, 0f));
         }
 
-        // Fell off platform
-        else if (this.transform.localPosition.y < 0)
+        // when fall off platform
+        if (this.transform.localPosition.y < 0)
         {
-            SetReward(0f);
-            EndEpisode();
+            EndWithReward(0f);
         }
+    }
+
+    void EndWithReward(float reward)
+    {
+        SetReward(reward);
+
+        collidedPenalty = 0f;
+        EndEpisode();
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
