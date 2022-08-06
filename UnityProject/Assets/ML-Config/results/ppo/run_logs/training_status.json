@@ -2,22 +2,22 @@
     "Ball": {
         "checkpoints": [
             {
-                "steps": 40473,
-                "file_path": "results\\ppo\\Ball\\Ball-40473.onnx",
-                "reward": 0.0,
-                "creation_time": 1659385629.3829362,
+                "steps": 187332,
+                "file_path": "results\\ppo\\Ball\\Ball-187332.onnx",
+                "reward": 0.8999999761581421,
+                "creation_time": 1659389935.4899309,
                 "auxillary_file_paths": [
-                    "results\\ppo\\Ball\\Ball-40473.pt"
+                    "results\\ppo\\Ball\\Ball-187332.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 40473,
+            "steps": 187332,
             "file_path": "results\\ppo\\Ball.onnx",
-            "reward": 0.0,
-            "creation_time": 1659385629.3829362,
+            "reward": 0.8999999761581421,
+            "creation_time": 1659389935.4899309,
             "auxillary_file_paths": [
-                "results\\ppo\\Ball\\Ball-40473.pt"
+                "results\\ppo\\Ball\\Ball-187332.pt"
             ]
         }
     },

@@ -68,7 +68,9 @@ public class BallScript : Agent
         Vector3 controlSignal = Vector3.zero;
         controlSignal.x = actionBuffers.ContinuousActions[0];
         controlSignal.z = actionBuffers.ContinuousActions[1];
-        rBody.AddForce(controlSignal * forceMultiplier);
+        //rBody.AddForce(controlSignal * forceMultiplier);
+
+        rBody.velocity = controlSignal * forceMultiplier;
 
         float distanceToTarget = Vector3.Distance(this.transform.localPosition, Target.localPosition);
 
